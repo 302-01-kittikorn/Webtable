@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบเก็บข้อมูลรูปแบบตาราง</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 40px;
+            background-color: #f4f7f6;
+        }
+        h2 { color: #333; }
+        .form-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        input, button {
+            padding: 10px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover { background-color: #27ae60; }
+        .btn-delete {
+            background-color: #e74c3c;
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+        .btn-delete:hover { background-color: #c0392b; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #fff;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th { background-color: #34495e; color: white; }
+        tr:hover { background-color: #f5f5f5; }
+    </style>
+</head>
+<body>
+
+    <h2>📊 ระบบบันทึกข้อมูลตาราง</h2>
+
+    <!-- ฟอร์มสำหรับกรอกข้อมูล -->
+    <div class="form-container">
+        <input type="text" id="inputName" placeholder="ชื่อ-นามสกุล">
+        <input type="text" id="inputRole" placeholder="ตำแหน่ง">
+        <input type="email" id="inputEmail" placeholder="อีเมล">
+        <button onclick="addData()">➕ เพิ่มข้อมูล</button>
+    </div>
+
+    <!-- ตารางแสดงผล -->
+    <table id="dataTable">
+        <thead>
+            <tr>
+                <th>ชื่อ-นามสกุล</th>
+                <th>ตำแหน่ง</th>
+                <th>อีเมล</th>
+                <th>จัดการ</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- ข้อมูลจะถูกเพิ่มที่นี่ด้วย JavaScript -->
+        </tbody>
+    </table>
+
+    <script>
+        // ฟังก์ชันสำหรับเพิ่มข้อมูลลงในตาราง
+        function addData() {
+            const name = document.getElementById('inputName').value;
+            const role = document.getElementById('inputRole').value;
+            const email = document.getElementById('inputEmail').value;
+
+            // ตรวจสอบว่ากรอกข้อมูลครบไหม
+            if (name === '' || role === '' || email === '') {
+                alert('กรุณากรอกข้อมูลให้ครบทุกช่องครับ');
+                return;
+            }
+
+            const table = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
+            const newRow = table.insertRow();
+
+            // สร้าง Cell สำหรับแต่ละข้อมูล
+            const cell1 = newRow.insertCell(0);
+            const cell2 = newRow.insertCell(1);
+            const cell3 = newRow.insertCell(2);
+            const cell4 = newRow.insertCell(3);
+
+            // ใส่ค่าลงใน Cell
+            cell1.innerHTML = name;
+            cell2.innerHTML = role;
+            cell3.innerHTML = email;
+            cell4.innerHTML = '<button class="btn-delete" onclick="deleteRow(this)">ลบ</button>';
+
+            // ล้างค่าในช่องกรอกหลังจากเพิ่มเสร็จ
+            document.getElementById('inputName').value = '';
+            document.getElementById('inputRole').value = '';
+            document.getElementById('inputEmail').value = '';
+        }
+
+        // ฟังก์ชันสำหรับลบแถวข้อมูล
+        function deleteRow(button) {
+            const row = button.parentNode.parentNode;
+            row.parentNode.removeChild(row);
+        }
+    </script>
+
+</body>
+</html>
