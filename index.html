@@ -2,166 +2,107 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <title>ระบบบันทึกข้อมูลตารางอย่างง่าย</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบจัดการข้อมูลแบบตาราง</title>
+    
+    <!-- ดึง CSS ของ Tabulator มาใช้เพื่อความสวยงาม -->
+    <link href="https://unpkg.com/tabulator-tables@5.5.2/dist/css/tabulator_bootstrap5.min.css" rel="stylesheet">
+    <script type="text/javascript" src="https://unpkg.com/tabulator-tables@5.5.2/dist/js/tabulator.min.js"></script>
+
     <style>
         body {
-            font-family: Arial, sans-serif;
-            padding: 30px;
-            background-color: #f9f9f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
+            background-color: #f8f9fa;
         }
         .container {
-            max-width: 800px;
+            max-width: 1000px;
             margin: 0 auto;
             background: white;
-            padding: 20px;
+            padding: 25px;
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-        .form-group {
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .toolbar {
             margin-bottom: 15px;
         }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        input {
-            width: 100%;
-            padding: 8px;
-            box-sizing: border-box;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
         button {
-            background-color: #007bff;
+            background-color: #0d6efd;
             color: white;
-            padding: 10px 15px;
             border: none;
+            padding: 8px 16px;
             border-radius: 4px;
             cursor: pointer;
-            width: 100%;
-            font-size: 16px;
+            font-size: 14px;
+            margin-right: 5px;
         }
         button:hover {
-            background-color: #0056b3;
+            background-color: #0b5ed7;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 25px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        .btn-delete {
+        button.btn-danger {
             background-color: #dc3545;
-            padding: 5px 10px;
-            font-size: 12px;
         }
-        .btn-delete:hover {
-            background-color: #bd2130;
+        button.btn-danger:hover {
+            background-color: #bb2d3b;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>📝 ฟอร์มกรอกข้อมูล</h2>
+    <h2>📊 ระบบจัดการข้อมูลแบบตาราง</h2>
     
-    <div class="form-group">
-        <label>หัวข้อ / รายการ:</label>
-        <input type="text" id="topic" placeholder="ตัวอย่าง: ซื้อของเข้าบ้าน, ชื่อพนักงาน">
+    <!-- ปุ่มควบคุม -->
+    <div class="toolbar">
+        <button id="add-row">➕ เพิ่มแถวใหม่</button>
+        <button id="del-row" class="btn-danger">🗑️ ลบแถวที่เลือก</button>
     </div>
-    
-    <div class="form-group">
-        <label>รายละเอียด / จำนวน:</label>
-        <input type="text" id="detail" placeholder="ตัวอย่าง: 500 บาท, ฝ่ายการตลาด">
-    </div>
-    
-    <button id="addBtn">บันทึกข้อมูลลงตาราง</button>
 
-    <h2>📊 ตารางแสดงข้อมูล</h2>
-    <table>
-        <thead>
-            <tr>
-                <th style="width: 10%;">ลำดับ</th>
-                <th>รายการ</th>
-                <th>รายละเอียด</th>
-                <th style="width: 15%;">จัดการ</th>
-            </tr>
-        </thead>
-        <tbody id="tableBody">
-            <!-- ข้อมูลจะมาโผล่ตรงนี้ -->
-        </tbody>
-    </table>
+    <!-- ส่วนที่จะแสดงตาราง -->
+    <div id="data-table"></div>
 </div>
 
 <script>
-    // ดึงปุ่มและตารางจากหน้าเว็บมาเตรียมใช้งาน
-    const addBtn = document.getElementById('addBtn');
-    const tableBody = document.getElementById('tableBody');
-    const topicInput = document.getElementById('topic');
-    const detailInput = document.getElementById('detail');
+    // 1. กำหนดข้อมูลเริ่มต้น (Sample Data)
+    var tableData = [
+        {id:1, name:"สมชาย ใจดี", age:28, role:"ผู้จัดการ", progress:100},
+        {id:2, name:"สมหญิง รักเรียน", age:23, role:"นักพัฒนาเว็บ", progress:40},
+        {id:3, name:"สมศักดิ์ ขยันงาน", age:35, role:"นักการตลาด", progress:80},
+    ];
 
-    // ตัวแปรสำหรับเก็บอาร์เรย์ของข้อมูล
-    let myData = [];
+    // 2. สร้างตาราง Tabulator
+    var table = new Tabulator("#data-table", {
+        data: tableData,           // ใส่ข้อมูลเริ่มต้น
+        layout: "fitColumns",      // ปรับขนาดคอลัมน์ให้พอดีหน้าจออัตโนมัติ
+        reactiveData: true,        // เปิดระบบ Sync ข้อมูลอัตโนมัติเมื่อมีการแก้ไข
+        selectable: 1,             // เลือกแถวได้ทีละ 1 แถวเพื่อกดลบ
+        columns: [                 // กำหนดหัวข้อคอลัมน์
+            {formatter:"rownum", width:40, hozAlign:"center"}, // ลำดับตัวเลขอัตโนมัติ
+            {title:"ชื่อ-นามสกุล", field:"name", editor:"input"}, // editor:"input" แปลว่ากดพิมพ์แก้ไขในตารางได้เลย
+            {title:"อายุ", field:"age", editor:"number", hozAlign:"left", width:100},
+            {title:"ตำแหน่ง", field:"role", editor:"input"},
+            {title:"ความคืบหน้า (%)", field:"progress", editor:"number", formatter:"progress", formatterParams:{color:["#dc3545", "#ffc107", "#198754"]}},
+        ],
+    });
 
-    // เมื่อกดปุ่มบันทึก
-    addBtn.onclick = function() {
-        const topicValue = topicInput.value.trim();
-        const detailValue = detailInput.value.trim();
+    // 3. ฟังก์ชันปุ่ม "เพิ่มแถวใหม่"
+    document.getElementById("add-row").addEventListener("click", function(){
+        table.addRow({name:"ดับเบิ้ลคลิกเพื่อแก้ชื่อ", age:20, role:"ระบุตำแหน่ง", progress:0});
+    });
 
-        // เช็กว่ากรอกข้อมูลหรือยัง
-        if (topicValue === "" || detailValue === "") {
-            alert("กรุณากรอกข้อมูลให้ครบทั้ง 2 ช่องครับ");
-            return;
+    // 4. ฟังก์ชันปุ่ม "ลบแถวที่เลือก"
+    document.getElementById("del-row").addEventListener("click", function(){
+        var selectedRows = table.getSelectedRows();
+        if(selectedRows.length > 0) {
+            selectedRows[0].delete();
+        } else {
+            alert("กรุณาคลิกเลือกแถวในตารางที่ต้องการลบก่อนครับ");
         }
-
-        // เก็บข้อมูลเข้าตัวแปร
-        const item = {
-            topic: topicValue,
-            detail: detailValue
-        };
-        myData.push(item);
-
-        // ล้างช่องกรอกข้อมูลให้ว่างพร้อมกรอกใหม่
-        topicInput.value = "";
-        detailInput.value = "";
-
-        // สั่งอัปเดตตาราง
-        updateTable();
-    };
-
-    // ฟังก์ชันสร้างแถวในตารางใหม่ทุกครั้งที่มีการเปลี่ยนแปลง
-    function updateTable() {
-        tableBody.innerHTML = ""; // ล้างตารางเก่าก่อน
-
-        for (let i = 0; i < myData.length; i++) {
-            // สร้างแถว (tr)
-            const row = document.createElement('tr');
-
-            // ใส่ข้อมูลในแต่ละคอลัมน์ (td)
-            row.innerHTML = `
-                <td>${i + 1}</td>
-                <td>${myData[i].topic}</td>
-                <td>${myData[i].detail}</td>
-                <td><button class="btn-delete" onclick="deleteRow(${i})">ลบ</button></td>
-            `;
-
-            tableBody.appendChild(row);
-        }
-    }
-
-    // ฟังก์ชันสำหรับลบแถวข้อมูล
-    function deleteRow(index) {
-        myData.splice(index, 1); // ลบข้อมูลในอาร์เรย์ตามลำดับที่เลือก
-        updateTable(); // อัปเดตตารางใหม่
-    }
+    });
 </script>
 
 </body>
