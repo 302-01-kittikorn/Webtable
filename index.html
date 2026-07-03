@@ -2,302 +2,167 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบเก็บข้อมูลรูปแบบตาราง</title>
+    <title>ระบบบันทึกข้อมูลตารางอย่างง่าย</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 40px;<!DOCTYPE html>
-<html lang="th">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบบันทึกข้อมูลรูปแบบตาราง</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 20px;
-            background-color: #f5f7fa;
-            color: #333;
+            font-family: Arial, sans-serif;
+            padding: 30px;
+            background-color: #f9f9f9;
         }
-        h2 {
-            color: #2c3e50;
-        }
-        .form-container {
-            background-color: #fff;
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
             padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        input, button {
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
         }
         input {
-            flex: 1;
-            min-width: 150px;
-        }
-        button {
-            background-color: #2ecc71;
-            color: white;
-            border: none;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        button:hover {
-            background-color: #27ae60;
-        }
-        .table-container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            overflow-x: auto;
-        }
-        table {
             width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-        }
-        th, td {
-            padding: 12px 15px;
-            border-bottom: 1px solid #ddd;
-        }
-        th {
-            background-color: #34495e;
-            color: white;
-        }
-        tr:hover {
-            background-color: #f1f2f6;
-        }
-        .btn-delete {
-            background-color: #e74c3c;
-            padding: 5px 10px;
-            font-size: 14px;
-        }
-        .btn-delete:hover {
-            background-color: #c0392b;
-        }
-    </style>
-</head>
-<body>
-
-    <h2>📊 ระบบบันทึกข้อมูลรูปแบบตาราง</h2>
-    
-    <!-- ส่วนฟอร์มสำหรับกรอกข้อมูล -->
-    <div class="form-container">
-        <input type="text" id="inputName" placeholder="ชื่อ-นามสกุล" required>
-        <input type="text" id="inputRole" placeholder="ตำแหน่ง / บทบาท">
-        <input type="email" id="inputEmail" placeholder="อีเมล">
-        <button onclick="addData()">➕ เพิ่มข้อมูล</button>
-    </div>
-
-    <!-- ส่วนตารางแสดงผล -->
-    <div class="table-container">
-        <table>
-            <thead>
-                <tr>
-                    <th>ลำดับ</th>
-                    <th>ชื่อ-นามสกุล</th>
-                    <th>ตำแหน่ง</th>
-                    <th>อีเมล</th>
-                    <th>จัดการ</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody">
-                <!-- ข้อมูลจะถูกเพิ่มเข้ามาตรงนี้ด้วย JavaScript -->
-            </tbody>
-        </table>
-    </div>
-
-    <script>
-        // โหลดข้อมูลจาก LocalStorage เมื่อเปิดหน้าเว็บ (ป้องกันข้อมูลหายเมื่อกด Refresh)
-        document.addEventListener("DOMContentLoaded", loadData);
-
-        function addData() {
-            const name = document.getElementById("inputName").value.trim();
-            const role = document.getElementById("inputRole").value.trim();
-            const email = document.getElementById("inputEmail").value.trim();
-
-            if (name === "") {
-                alert("กรุณากรอกชื่อ-นามสกุล");
-                return;
-            }
-
-            const newData = { name, role, email };
-            
-            // ดึงข้อมูลเก่า ออกมาแปลงเป็น Array
-            let dataList = JSON.parse(localStorage.getItem("tableData")) || [];
-            dataList.push(newData);
-            
-            // บันทึกลง LocalStorage
-            localStorage.setItem("tableData", JSON.stringify(dataList));
-
-            // รีเซ็ตฟอร์มและอัปเดตตาราง
-            document.getElementById("inputName").value = "";
-            document.getElementById("inputRole").value = "";
-            document.getElementById("inputEmail").value = "";
-            
-            renderTable();
-        }
-
-        function renderTable() {
-            const tableBody = document.getElementById("tableBody");
-            tableBody.innerHTML = "";
-            
-            let dataList = JSON.parse(localStorage.getItem("tableData")) || [];
-
-            dataList.forEach((item, index) => {
-                const row = `
-                    <tr>
-                        <td>${index + 1}</td>
-                        <td>${item.name}</td>
-                        <td>${item.role || '-'}</td>
-                        <td>${item.email || '-'}</td>
-                        <td><button class="btn-delete" onclick="deleteData(${index})">ลบ</button></td>
-                    </tr>
-                `;
-                tableBody.innerHTML += row;
-            });
-        }
-
-        function deleteData(index) {
-            if(confirm("คุณแน่ใจใช่ไหมที่จะลบข้อมูลนี้?")) {
-                let dataList = JSON.parse(localStorage.getItem("tableData")) || [];
-                dataList.splice(index, 1); // ลบข้อมูลตาม index
-                localStorage.setItem("tableData", JSON.stringify(dataList));
-                renderTable();
-            }
-        }
-
-        function loadData() {
-            renderTable();
-        }
-    </script>
-
-</body>
-</html>
-            background-color: #f4f7f6;
-        }
-        h2 { color: #333; }
-        .form-container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-        }
-        input, button {
-            padding: 10px;
-            margin: 5px;
+            padding: 8px;
+            box-sizing: border-box;
             border: 1px solid #ccc;
             border-radius: 4px;
-            font-size: 16px;
         }
         button {
-            background-color: #2ecc71;
+            background-color: #007bff;
             color: white;
+            padding: 10px 15px;
             border: none;
+            border-radius: 4px;
             cursor: pointer;
+            width: 100%;
+            font-size: 16px;
         }
-        button:hover { background-color: #27ae60; }
-        .btn-delete {
-            background-color: #e74c3c;
-            padding: 5px 10px;
-            font-size: 14px;
+        button:hover {
+            background-color: #0056b3;
         }
-        .btn-delete:hover { background-color: #c0392b; }
         table {
             width: 100%;
             border-collapse: collapse;
-            background-color: #fff;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            border-radius: 8px;
-            overflow: hidden;
+            margin-top: 25px;
         }
         th, td {
-            padding: 12px 15px;
+            border: 1px solid #ddd;
+            padding: 10px;
             text-align: left;
-            border-bottom: 1px solid #ddd;
         }
-        th { background-color: #34495e; color: white; }
-        tr:hover { background-color: #f5f5f5; }
+        th {
+            background-color: #f2f2f2;
+        }
+        .btn-delete {
+            background-color: #dc3545;
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        .btn-delete:hover {
+            background-color: #bd2130;
+        }
     </style>
 </head>
 <body>
 
-    <h2>📊 ระบบบันทึกข้อมูลตาราง</h2>
-
-    <!-- ฟอร์มสำหรับกรอกข้อมูล -->
-    <div class="form-container">
-        <input type="text" id="inputName" placeholder="ชื่อ-นามสกุล">
-        <input type="text" id="inputRole" placeholder="ตำแหน่ง">
-        <input type="email" id="inputEmail" placeholder="อีเมล">
-        <button onclick="addData()">➕ เพิ่มข้อมูล</button>
+<div class="container">
+    <h2>📝 ฟอร์มกรอกข้อมูล</h2>
+    
+    <div class="form-group">
+        <label>หัวข้อ / รายการ:</label>
+        <input type="text" id="topic" placeholder="ตัวอย่าง: ซื้อของเข้าบ้าน, ชื่อพนักงาน">
     </div>
+    
+    <div class="form-group">
+        <label>รายละเอียด / จำนวน:</label>
+        <input type="text" id="detail" placeholder="ตัวอย่าง: 500 บาท, ฝ่ายการตลาด">
+    </div>
+    
+    <button id="addBtn">บันทึกข้อมูลลงตาราง</button>
 
-    <!-- ตารางแสดงผล -->
-    <table id="dataTable">
+    <h2>📊 ตารางแสดงข้อมูล</h2>
+    <table>
         <thead>
             <tr>
-                <th>ชื่อ-นามสกุล</th>
-                <th>ตำแหน่ง</th>
-                <th>อีเมล</th>
-                <th>จัดการ</th>
+                <th style="width: 10%;">ลำดับ</th>
+                <th>รายการ</th>
+                <th>รายละเอียด</th>
+                <th style="width: 15%;">จัดการ</th>
             </tr>
         </thead>
-        <tbody>
-            <!-- ข้อมูลจะถูกเพิ่มที่นี่ด้วย JavaScript -->
+        <tbody id="tableBody">
+            <!-- ข้อมูลจะมาโผล่ตรงนี้ -->
         </tbody>
     </table>
+</div>
 
-    <script>
-        // ฟังก์ชันสำหรับเพิ่มข้อมูลลงในตาราง
-        function addData() {
-            const name = document.getElementById('inputName').value;
-            const role = document.getElementById('inputRole').value;
-            const email = document.getElementById('inputEmail').value;
+<script>
+    // ดึงปุ่มและตารางจากหน้าเว็บมาเตรียมใช้งาน
+    const addBtn = document.getElementById('addBtn');
+    const tableBody = document.getElementById('tableBody');
+    const topicInput = document.getElementById('topic');
+    const detailInput = document.getElementById('detail');
 
-            // ตรวจสอบว่ากรอกข้อมูลครบไหม
-            if (name === '' || role === '' || email === '') {
-                alert('กรุณากรอกข้อมูลให้ครบทุกช่องครับ');
-                return;
-            }
+    // ตัวแปรสำหรับเก็บอาร์เรย์ของข้อมูล
+    let myData = [];
 
-            const table = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
-            const newRow = table.insertRow();
+    // เมื่อกดปุ่มบันทึก
+    addBtn.onclick = function() {
+        const topicValue = topicInput.value.trim();
+        const detailValue = detailInput.value.trim();
 
-            // สร้าง Cell สำหรับแต่ละข้อมูล
-            const cell1 = newRow.insertCell(0);
-            const cell2 = newRow.insertCell(1);
-            const cell3 = newRow.insertCell(2);
-            const cell4 = newRow.insertCell(3);
-
-            // ใส่ค่าลงใน Cell
-            cell1.innerHTML = name;
-            cell2.innerHTML = role;
-            cell3.innerHTML = email;
-            cell4.innerHTML = '<button class="btn-delete" onclick="deleteRow(this)">ลบ</button>';
-
-            // ล้างค่าในช่องกรอกหลังจากเพิ่มเสร็จ
-            document.getElementById('inputName').value = '';
-            document.getElementById('inputRole').value = '';
-            document.getElementById('inputEmail').value = '';
+        // เช็กว่ากรอกข้อมูลหรือยัง
+        if (topicValue === "" || detailValue === "") {
+            alert("กรุณากรอกข้อมูลให้ครบทั้ง 2 ช่องครับ");
+            return;
         }
 
-        // ฟังก์ชันสำหรับลบแถวข้อมูล
-        function deleteRow(button) {
-            const row = button.parentNode.parentNode;
-            row.parentNode.removeChild(row);
+        // เก็บข้อมูลเข้าตัวแปร
+        const item = {
+            topic: topicValue,
+            detail: detailValue
+        };
+        myData.push(item);
+
+        // ล้างช่องกรอกข้อมูลให้ว่างพร้อมกรอกใหม่
+        topicInput.value = "";
+        detailInput.value = "";
+
+        // สั่งอัปเดตตาราง
+        updateTable();
+    };
+
+    // ฟังก์ชันสร้างแถวในตารางใหม่ทุกครั้งที่มีการเปลี่ยนแปลง
+    function updateTable() {
+        tableBody.innerHTML = ""; // ล้างตารางเก่าก่อน
+
+        for (let i = 0; i < myData.length; i++) {
+            // สร้างแถว (tr)
+            const row = document.createElement('tr');
+
+            // ใส่ข้อมูลในแต่ละคอลัมน์ (td)
+            row.innerHTML = `
+                <td>${i + 1}</td>
+                <td>${myData[i].topic}</td>
+                <td>${myData[i].detail}</td>
+                <td><button class="btn-delete" onclick="deleteRow(${i})">ลบ</button></td>
+            `;
+
+            tableBody.appendChild(row);
         }
-    </script>
+    }
+
+    // ฟังก์ชันสำหรับลบแถวข้อมูล
+    function deleteRow(index) {
+        myData.splice(index, 1); // ลบข้อมูลในอาร์เรย์ตามลำดับที่เลือก
+        updateTable(); // อัปเดตตารางใหม่
+    }
+</script>
 
 </body>
 </html>
